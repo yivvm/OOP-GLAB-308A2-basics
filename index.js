@@ -1,5 +1,6 @@
 // GLAB 308A.2.1: An Object-Oriented Adventure
 
+/*
 // Part 1:
 const adventurer = {
     name: "Robin",
@@ -91,8 +92,33 @@ const companion = new Companion('Leo', 'cat');
 // console.log(companion)
 robin2.companion = companion
 // console.log(robin2)
-
+*/
 
 // Part 4: class uniforms
-Character.MAX_HEALTH = 100;
-console.log(new Character())
+class Character {
+    static MAX_HEALTH = 100;
+}
+
+class Adventure extends Character {
+    static ROLES = ['Fighter', 'Healer', 'Wizard'];
+
+    constructor (name, role) {
+        super();
+
+        // check the role that needs to be included in ROLES
+        if (!Adventure.ROLES.includes(role)) {
+            throw new Error(`Invalid role. Available roles: ${Adventure.ROLES.join(', ')}`);
+        }
+
+        this.name = name;
+        this.role = role;
+    }
+}
+
+try {
+     const adventurer1 = new Adventure('Robin', 'Righter');
+     console.log(adventurer1)
+} catch (error) {
+    console.error(error.message);
+}
+
