@@ -122,3 +122,33 @@ try {
     console.error(error.message);
 }
 
+
+// Part 5: gather your party
+class AdventurerFactory {
+    constructor (role) {
+        this.role = role;
+        this.adventurers = [];
+    }
+    generate(name) {
+        const newAdventurer = new AdventurerFactory(name, this.role);
+        this.adventurers.push(newAdventurer);
+    }
+    findByIndex (index) {
+        return this.adventurers[index];
+    }
+    findByName (name) {
+        return this.adventurers.find((a) => a.name === name);
+    }
+}
+
+const healers = new AdventurerFactory("Healer");
+const robin = healers.generate("Robin");
+
+class Healer extends Adventure {
+    constructor (name) {
+        super(name, 'Healer');
+    }
+}
+
+
+// Part 6: 
