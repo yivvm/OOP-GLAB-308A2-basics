@@ -1,6 +1,6 @@
 // GLAB 308A.2.1: An Object-Oriented Adventure
 
-/*
+
 // Part 1:
 const adventurer = {
     name: "Robin",
@@ -44,6 +44,14 @@ class Character {
         this.name = name;
         this.health = 100;
         this.inventory = [];
+    }
+    addItem(item) {
+        this.inventory.push(item);
+    }
+    addItems(items) {
+        items.forEach((i) => {
+            this.inventory.push(i)
+        })
     }
 }
 
@@ -92,35 +100,35 @@ const companion = new Companion('Leo', 'cat');
 // console.log(companion)
 robin2.companion = companion
 // console.log(robin2)
-*/
+
 
 // Part 4: class uniforms
-class Character {
-    static MAX_HEALTH = 100;
-}
+// class Character {
+//     static MAX_HEALTH = 100;
+// }
 
-class Adventure extends Character {
-    static ROLES = ['Fighter', 'Healer', 'Wizard'];
+// class Adventure extends Character {
+//     static ROLES = ['Fighter', 'Healer', 'Wizard'];
 
-    constructor (name, role) {
-        super();
+//     constructor (name, role) {
+//         super();
 
-        // check the role that needs to be included in ROLES
-        if (!Adventure.ROLES.includes(role)) {
-            throw new Error(`Invalid role. Available roles: ${Adventure.ROLES.join(', ')}`);
-        }
+//         // check the role that needs to be included in ROLES
+//         if (!Adventure.ROLES.includes(role)) {
+//             throw new Error(`Invalid role. Available roles: ${Adventure.ROLES.join(', ')}`);
+//         }
 
-        this.name = name;
-        this.role = role;
-    }
-}
+//         this.name = name;
+//         this.role = role;
+//     }
+// }
 
-try {
-     const adventurer1 = new Adventure('Robin', 'Righter');
-     console.log(adventurer1)
-} catch (error) {
-    console.error(error.message);
-}
+// try {
+//      const adventurer1 = new Adventure('Robin', 'Righter');
+//      console.log(adventurer1)
+// } catch (error) {
+//     console.error(error.message);
+// }
 
 
 // Part 5: gather your party
@@ -142,7 +150,7 @@ class AdventurerFactory {
 }
 
 const healers = new AdventurerFactory("Healer");
-const robin = healers.generate("Robin");
+const robin3 = healers.generate("Robin");
 
 class Healer extends Adventure {
     constructor (name) {
@@ -150,5 +158,34 @@ class Healer extends Adventure {
     }
 }
 
+// console.log(robin3)
 
-// Part 6: 
+
+// Part 6: developing skills
+function duel(adventurer1, adventurer2) {
+    while (adventurer1.health > 50 && adventurer2.health > 50) {
+        const roll1 = adventurer1.roll();
+        const roll2 = adventurer2.roll();
+
+        if (roll1 < roll2) {
+            adventurer1.health -= 1;
+            console.log(`${adventurer1.name} lost 1 health. Current health: ${adventurer1.health}`);
+        } else if (roll1 > roll2) {
+            adventurer2.health -= 1;
+            console.log(`${adventurer2.name} lost 1 health. Current health: ${adventurer2.health}`);
+        } else {
+            console.log("It's a tile!");
+        }
+    }
+
+    if (adventurer1.health <= 50) {
+        console.log(`${adventurer2.name} wins the duel!`)
+    } else {
+        console.log(`${adventurer1.name} wins the duel!`)
+    }
+    
+}
+
+// add duel method to Adventure class prototype
+Adventure.prototype.duel = duel;
+console.log(Adventure.prototype)
