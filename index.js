@@ -49,9 +49,10 @@ class Character {
         this.inventory.push(item);
     }
     addItems(items) {
-        items.forEach((i) => {
-            this.inventory.push(i)
-        })
+        // items.forEach((i) => {
+        //     this.inventory.push(i)
+        // })
+        this.inventory.push(...items);
     }
 }
 
@@ -65,7 +66,8 @@ robin.companion.companion.inventory = ['small hat', 'sunglasses'];
 
 Character.prototype.roll = function (mod = 0) {
     const result = Math.floor(Math.random() * 20) + 1 + mod;
-    console.log(`${this.name} rolled a ${result}.`)
+    console.log(`${this.name} rolled a ${result}.`);
+    return result;
 }
 
 // console.log(robin)
@@ -80,8 +82,8 @@ class Adventure extends Character {
     }
     scout () {
         console.log(`${this.name} is scouting ahead...`);
-        super.roll();
-        return `End`;
+        // super.roll();
+        return this.roll();
     }
 }
 
@@ -89,6 +91,9 @@ class Companion extends Character {
     constructor (name, type) {
         super(name);
         this.type = type;
+    }
+    interact() {
+        console.log(`${this.name} the ${this.type} is interacting.`)
     }
 }
 
@@ -167,6 +172,8 @@ function duel(adventurer1, adventurer2) {
         const roll1 = adventurer1.roll();
         const roll2 = adventurer2.roll();
 
+        console.log(`${adventurer1.name} rolled a ${roll1}. ${adventurer2.name} rolled a ${roll2}.`)
+
         if (roll1 < roll2) {
             adventurer1.health -= 1;
             console.log(`${adventurer1.name} lost 1 health. Current health: ${adventurer1.health}`);
@@ -189,3 +196,181 @@ function duel(adventurer1, adventurer2) {
 // add duel method to Adventure class prototype
 Adventure.prototype.duel = duel;
 console.log(Adventure.prototype)
+
+
+// Part 7: adventure forth
+// 7.1 Generate a whole host of adventurers and their companions, and have them interact using the instance methods you have developed.
+const adventurer1 = new Adventure('Bill', 'Fighter');
+const companion1 = new Companion('Lynn', 'cat');
+adventurer1.companion = companion1
+
+const adventurer2 = new Adventure('Alice', 'Healer');
+const companion2 = new Companion('Max', 'dog');
+adventurer2.companion = companion2;
+
+adventurer1.scout();
+adventurer2.scout();
+adventurer1.companion.interact();
+adventurer2.companion.interact();
+
+// duel(adventurer1, adventurer2);
+
+
+// 7.2 create other classes that can interact with your characters; perhaps more characters, but in a different direction from adventurers or companions – dragons, orcs, elves, vampires...
+class Dragon extends Character {
+    constructor(name, color) {
+        super(name);
+        this.color = color;
+    }
+
+    breathFire(target) {
+        console.log(`${this.name} breathes fire at ${target.name}.`)
+        target.health -= 20;
+        console.log(`${this.name} takes 20 damage. Current health: ${target.health}.`);
+    }
+}
+
+class Orc extends Character {
+    constructor(name, weapon) {
+        super(name);
+        this.weapon = weapon;
+    }
+
+    attack(target) {
+        console.log(`${this.name} swings ${this.weapon} at ${target.name}.`);
+        target.health -= 15;
+        console.log(`${target.name} takes 15 damage. Current health: ${target.health}.`);
+    }
+}
+
+class Elf extends Character {
+    constructor(name, magic) {
+        super(name);
+        this.magic = magic;
+    }
+    
+    castSpell(target) {
+        console.log(`${this.name} cast ${this.magic} on ${target.name}.`)
+        target.health -= 10;
+        console.log(`${target.name} takes 10 damage. Current health: ${target.health}.`);
+    }
+}
+
+class Vampire extends Character {
+    constructor(name) {
+        super(name);
+    }
+
+    bite(target) {
+        console.log(`${this.name} bites ${target.name}.`);
+        target.health -= 5;
+        this.health += 5;
+        console.log(`${target.name} takes 5 damage. Current health: ${target.health}.`);
+        console.log(`${this.name} gains 5 health. Current health: ${this.health}.`);
+    }
+}
+
+const dragon = new Dragon('Smaug', 'red');
+const orc = new Orc('Gorrok', 'battleaxe');
+const elf = new Elf('Legolas', 'arrow of piercing');
+const vampire = new Vampire('Dracula');
+
+dragon.breathFire(adventurer1);
+orc.attack(adventurer2);
+elf.castSpell(adventurer1);
+vampire.bite(adventurer2);
+
+dragon.breathFire(companion1);
+orc.attack(companion2);
+elf.castSpell(companion1);
+vampire.bite(companion2);
+
+
+// 7.3 create classes for the inventory itself, and include inventory methods such as adding, removing, searching, selling, trading. Even individual items could be their own classes, and have properties and methods specific to the type of item.
+class Inventory {
+    constructor() {
+        this.items = [];
+    }
+
+    addItem(item) {
+        this.items.push(item);
+    }
+
+    removeItem(item) {
+        const index = this.items.indexOf(item);
+        if (index !== -1)  {// indexOf() method returns -1 if the item is not found in the array
+            this.items.splice(index, 1);
+        }
+    }
+
+    searchItem(name) {
+        return this.items.find((i) => i.name === name);
+    }
+
+    sellItem(name, price) {
+        const item = this.searchItem(name);
+        if (item) {
+            this.removeItem(item);
+            console.log(`Sold ${item.name} for ${price} gold.`)
+        } else {
+            console.log(`Item ${name} not found in inventory.`);
+        }
+    }
+
+    tradeItem(item, targetInventory) {
+        if (this.items.includes(item)) {
+            this.removeItem(item);
+            targetInventory.addItem(item);
+            console.log(`Traded ${item.name} with ${targetInventory.constructor.name}.`);
+        } else {
+            console.log(`Item ${item.name} not found in inventory.`);
+        }
+    }
+}
+
+class Item {
+    constructor(name, description) {
+        this.name = name;
+        this.description = description;
+    }
+}
+
+class Weapon extends Item {
+    constructor(name, description, damage) {
+        super(name, description)
+        this.damage = damage;
+    }
+
+    attack(target) {
+        console.log(`Attacting ${target.name} with ${this.name}.`);
+        target.health -= this.damage;
+        console.log(`${target.name} takes ${this.damage} damage. Current health: ${target.health}.`);
+    }
+}
+
+class Potion extends Item {
+    constructor(name, description, healingPower) {
+        super(name, description);
+        this.healingPower = healingPower;
+    }
+
+    use(target) {
+        console.log(`Using ${this.name} on ${target.name}.`);
+        target.health += this.healingPower;
+        console.log(`${target.name} gains ${this.healingPower} health. Current health: ${target.health}.`);
+    }
+}
+
+const playerInventory = new Inventory();
+const vendorInventory = new Inventory();
+
+const sword = new Weapon('Sword', 'A sharp blade.', 15);
+const potion = new Potion('Healing Potion', 'Restores health', 20);
+
+playerInventory.addItem(sword);
+playerInventory.addItem(potion);
+
+playerInventory.sellItem('Sword', 10);
+playerInventory.sellItem('Axe', 15);
+
+playerInventory.tradeItem(potion, vendorInventory);
